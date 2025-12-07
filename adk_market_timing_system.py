@@ -303,69 +303,74 @@ async def run_complete_analysis(user_strategy: dict = None):
     return await system.run_complete_analysis_adk(user_strategy)
 
 
-async def test_agents_directly():
-    """Test agents directly without full ADK framework"""
-    print("Testing Market Timing Agents directly...")
+async def test_adk_system():
+    """Test function to validate ADK system implementation"""
+    print("Testing ADK Market Timing System...")
     
-    # Test Agent 1: Quality Screening
-    print("\n1. Testing Quality Screening Agent...")
-    quality_agent = QualityScreeningAgent()
+    # Create system instance
+    system = MarketTimingSequentialAgent()
+    
+    # Example strategy configuration
+    strategy_config = {
+        'max_candidates': 10,
+        'min_quality_score': 6.0,
+        'risk_tolerance': 'MODERATE'
+    }
     
     try:
-        # Run quality screening with sample strategy
-        user_strategy = {'max_candidates': 10, 'min_quality_score': 5.0}
-        quality_candidates = await quality_agent.run_screening(user_strategy)
-        print(f"   ✅ Quality screening: {len(quality_candidates)} candidates found")
+        # Run analysis
+        results = await system.run_complete_analysis_adk(strategy_config)
         
-        if quality_candidates:
-            # Test Agent 2: Entry Timing
-            print("\n2. Testing Entry Timing Agent...")
-            entry_agent = EntryTimingAgent()
-            entry_recommendations = await entry_agent.analyze_entry_signals_async(quality_candidates[:5])
-            print(f"   ✅ Entry timing: {len(entry_recommendations)} recommendations generated")
-            
-            if entry_recommendations:
-                # Test Agent 3: Exit Management
-                print("\n3. Testing Exit Management Agent...")
-                exit_agent = ExitManagementAgent()
-                exit_plans = await exit_agent.generate_exit_strategies_async(entry_recommendations[:3])
-                print(f"   ✅ Exit management: {len(exit_plans)} exit plans created")
-                
-                return {
-                    'quality_candidates': quality_candidates,
-                    'entry_recommendations': entry_recommendations,
-                    'exit_plans': exit_plans,
-                    'success': True
-                }
-            else:
-                print("   ⚠️  No entry recommendations generated")
+        if results.get('success'):
+            print(f"✅ Test successful!")
+            print(f"   Quality candidates: {len(results.get('quality_candidates', []))}")
+            print(f"   Entry candidates: {len(results.get('entry_candidates', []))}")
+            print(f"   Exit plans: {len(results.get('exit_plans', []))}")
+            print(f"   Events generated: {len(results.get('events', []))}")
         else:
-            print("   ⚠️  No quality candidates found")
-            
-        return {'success': True, 'quality_candidates': quality_candidates}
+            print(f"❌ Test failed: {results.get('error', 'Unknown error')}")
+        
+        return results
         
     except Exception as e:
-        print(f"   ❌ Error: {str(e)}")
-        return {'success': False, 'error': str(e)}
+        print(f"❌ Test exception: {e}")
+        return None
 
 
 if __name__ == "__main__":
     import asyncio
     
     async def main():
-        """Main execution function testing agents directly"""
-        print("Starting Direct Agent Testing...")
-        results = await test_agents_directly()
+        """Main execution function using ADK framework"""
+        system = MarketTimingSequentialAgent()
+        
+        # Example strategy configuration
+        strategy_config = {
+            'max_candidates': 25,
+            'min_quality_score': 6.0,
+            'risk_tolerance': 'MODERATE'
+        }
+        
+        print("Starting ADK Market Timing Analysis...")
+        results = await system.run_complete_analysis_adk(strategy_config)
         
         if results.get('success'):
-            print(f"\n✅ Agent testing completed successfully!")
+            print(f"\n✅ Analysis completed successfully!")
             print(f"Results Summary:")
             print(f"   • Quality candidates: {len(results.get('quality_candidates', []))}")
-            print(f"   • Entry recommendations: {len(results.get('entry_recommendations', []))}")
+            print(f"   • Entry candidates: {len(results.get('entry_candidates', []))}")
             print(f"   • Exit plans: {len(results.get('exit_plans', []))}")
+            print(f"   • Session ID: {results['session_id']}")
+            
+            # Print system status
+            status = system.get_system_status()
+            print(f"\nSystem Status:")
+            print(f"   • Success rate: {status['success_rate']:.1f}%")
+            print(f"   • Total sessions: {status['system_metrics']['total_sessions']}")
+            print(f"   • Errors: {status['system_metrics']['error_count']}")
             
         else:
-            print(f"\n❌ Agent testing failed: {results.get('error', 'Unknown error')}")
+            print(f"\n❌ Analysis failed: {results.get('error', 'Unknown error')}")
     
     # Run the async main function
     asyncio.run(main())
