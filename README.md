@@ -132,6 +132,8 @@ The `MarketTimingSequentialAgent` follows this sophisticated workflow:
 
 The agent system demonstrates sophisticated market timing capabilities with intelligent entry/exit decisions, confidence-based filtering, and comprehensive risk management across 1,884+ trades.
 
+Note: This backtest does not reflect the full system because the screening agent was not included. The stocks used in this run were selected randomly and may not represent fundamentally strong or investable candidates. Therefore, the results should not be judged based on returns, since the test did not begin with quality-screened stocks.
+
 ## 🔧 Configuration
 
 ### Environment Variables
